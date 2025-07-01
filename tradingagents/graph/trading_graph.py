@@ -173,9 +173,9 @@ class TradingAgentsGraph:
                     continue
                 
                 message = chunk["messages"][-1]
-                # 중복 메시지 필터링
+                
                 if message.content and message.content.strip():
-                    # FINAL PROPOSAL 중복 방지
+                    
                     if "FINAL TRANSACTION PROPOSAL:" in message.content:
                         if not hasattr(self, '_final_printed'):
                             message.pretty_print()
