@@ -203,9 +203,9 @@ def select_deep_thinking_agent(provider) -> str:
             ("Claude Opus 4 - Most powerful Anthropic model", "	claude-opus-4-0"),
         ],
         "google": [
-            ("Gemini 2.0 Flash-Lite - Cost efficiency and low latency", "gemini-2.0-flash-lite"),
             ("Gemini 2.0 Flash - Next generation features, speed, and thinking", "gemini-2.0-flash"),
-            ("Gemini 2.5 Flash - Adaptive thinking, cost efficiency", "gemini-2.5-flash-preview-05-20"),
+            ("Gemini 2.5 Flash-Lite - Cost efficiency and low latency", "gemini-2.5-flash-lite-preview-06-17"),
+            ("Gemini 2.5 Flash - Adaptive thinking, cost efficiency", "gemini-2.5-flash"),
             ("Gemini 2.5 Pro - Most powerful Gemini model", "gemini-2.5-pro"),
         ],
         "openrouter": [
