@@ -707,16 +707,15 @@ def get_stock_news(ticker, curr_date):
     config = get_config()
     search_provider = SearchProviderFactory.create_provider(config)
     query = f"Can you search Social Media for {ticker} from 7 days before {curr_date} to {curr_date}? Make sure you only get the data posted during that period."
-    return search_provider.search(query, ticker, curr_date)
+    return search_provider.search(query)
     
-
 
 
 def get_global_news(curr_date):
     config = get_config()
     search_provider = SearchProviderFactory.create_provider(config)
     query = f"Search for global macroeconomic news and financial market updates from 7 days before {curr_date} to {curr_date}. Focus on central bank decisions, economic indicators, geopolitical events, and market-moving news that would be important for trading decisions."
-    return search_provider.search(query, curr_date)
+    return search_provider.search(query)
     
   
 
@@ -724,5 +723,5 @@ def get_fundamentals(ticker, curr_date):
     config = get_config()
     search_provider = SearchProviderFactory.create_provider(config)
     query = f"Search for fundamental analysis data and financial metrics for {ticker} stock from the month before {curr_date} to the month of {curr_date}. Look for earnings reports, financial ratios like PE, PS, cash flow, revenue growth, analyst ratings, and any fundamental analysis discussions. Please present key metrics in a structured format."
-    return search_provider.search(query, ticker, curr_date)
+    return search_provider.search(query)
     
