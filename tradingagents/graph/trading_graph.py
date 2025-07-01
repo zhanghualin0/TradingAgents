@@ -170,10 +170,20 @@ class TradingAgentsGraph:
             trace = []
             for chunk in self.graph.stream(init_agent_state, **args):
                 if len(chunk["messages"]) == 0:
-                    pass
-                else:
-                    chunk["messages"][-1].pretty_print()
-                    trace.append(chunk)
+                    continue
+                
+                message = chunk["messages"][-1]
+                # 중복 메시지 필터링
+                if message.content and message.content.strip():
+                    # FINAL PROPOSAL 중복 방지
+                    if "FINAL TRANSACTION PROPOSAL:" in message.content:
+                        if not hasattr(self, '_final_printed'):
+                            message.pretty_print()
+                            self._final_printed = True
+                    else:
+                        message.pretty_print()
+                
+                trace.append(chunk)
 
             final_state = trace[-1]
         else:
