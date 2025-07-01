@@ -702,106 +702,214 @@ def get_YFin_data(
     return filtered_data
 
 
-def get_stock_news_openai(ticker, curr_date):
+def get_stock_news(ticker, curr_date):
     config = get_config()
-    client = OpenAI(base_url=config["backend_url"])
+    
+    # Check if using Google API - implement grounding with Google Search
+    if "generativelanguage.googleapis.com" in config["backend_url"]:
+        try:
+            from google import genai
+            from google.genai.types import Tool, GenerateContentConfig, GoogleSearch
+            
+            client = genai.Client()
+            
+            # Create Google Search grounding tool
+            google_search_tool = Tool(
+                google_search=GoogleSearch()
+            )
+            
+            # Generate content with grounding
+            response = client.models.generate_content(
+                model=config["quick_think_llm"],
+                contents=f"Can you search for recent social media and news about {ticker} stock from 7 days before {curr_date} to {curr_date}? Focus on sentiment, price movements, and any significant developments that could impact trading decisions.",
+                config=GenerateContentConfig(
+                    tools=[google_search_tool],
+                    response_modalities=["TEXT"]
+                )
+            )
+            
+            # Extract text from response
+            result_text = ""
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, 'text'):
+                    result_text += part.text
+            
+            return result_text
+            
+        except Exception as e:
+            return f"Error retrieving stock news for {ticker}: {str(e)}"
+    else:
+        # For OpenAI and other APIs, use original implementation
+        client = OpenAI(base_url=config["backend_url"])
 
-    response = client.responses.create(
-        model=config["quick_think_llm"],
-        input=[
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "input_text",
-                        "text": f"Can you search Social Media for {ticker} from 7 days before {curr_date} to {curr_date}? Make sure you only get the data posted during that period.",
-                    }
-                ],
-            }
-        ],
-        text={"format": {"type": "text"}},
-        reasoning={},
-        tools=[
-            {
-                "type": "web_search_preview",
-                "user_location": {"type": "approximate"},
-                "search_context_size": "low",
-            }
-        ],
-        temperature=1,
-        max_output_tokens=4096,
-        top_p=1,
-        store=True,
-    )
+        response = client.responses.create(
+            model=config["quick_think_llm"],
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": f"Can you search Social Media for {ticker} from 7 days before {curr_date} to {curr_date}? Make sure you only get the data posted during that period.",
+                        }
+                    ],
+                }
+            ],
+            text={"format": {"type": "text"}},
+            reasoning={},
+            tools=[
+                {
+                    "type": "web_search_preview",
+                    "user_location": {"type": "approximate"},
+                    "search_context_size": "low",
+                }
+            ],
+            temperature=1,
+            max_output_tokens=4096,
+            top_p=1,
+            store=True,
+        )
 
-    return response.output[1].content[0].text
+        return response.output[1].content[0].text
 
 
-def get_global_news_openai(curr_date):
+def get_global_news(curr_date):
     config = get_config()
-    client = OpenAI(base_url=config["backend_url"])
+    
+    # Check if using Google API - implement grounding with Google Search
+    if "generativelanguage.googleapis.com" in config["backend_url"]:
+        try:
+            from google import genai
+            from google.genai.types import Tool, GenerateContentConfig, GoogleSearch
+            
+            client = genai.Client()
+            
+            # Create Google Search grounding tool
+            google_search_tool = Tool(
+                google_search=GoogleSearch()
+            )
+            
+            # Generate content with grounding
+            response = client.models.generate_content(
+                model=config["quick_think_llm"],
+                contents=f"Search for global macroeconomic news and financial market updates from 7 days before {curr_date} to {curr_date}. Focus on central bank decisions, economic indicators, geopolitical events, and market-moving news that would be important for trading decisions.",
+                config=GenerateContentConfig(
+                    tools=[google_search_tool],
+                    response_modalities=["TEXT"]
+                )
+            )
+            
+            # Extract text from response
+            result_text = ""
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, 'text'):
+                    result_text += part.text
+            
+            return result_text
+            
+        except Exception as e:
+            return f"Error retrieving global news: {str(e)}"
+    else:
+        # For OpenAI and other APIs, use original implementation
+        client = OpenAI(base_url=config["backend_url"])
 
-    response = client.responses.create(
-        model=config["quick_think_llm"],
-        input=[
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "input_text",
-                        "text": f"Can you search global or macroeconomics news from 7 days before {curr_date} to {curr_date} that would be informative for trading purposes? Make sure you only get the data posted during that period.",
-                    }
-                ],
-            }
-        ],
-        text={"format": {"type": "text"}},
-        reasoning={},
-        tools=[
-            {
-                "type": "web_search_preview",
-                "user_location": {"type": "approximate"},
-                "search_context_size": "low",
-            }
-        ],
-        temperature=1,
-        max_output_tokens=4096,
-        top_p=1,
-        store=True,
-    )
+        response = client.responses.create(
+            model=config["quick_think_llm"],
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": f"Can you search global or macroeconomics news from 7 days before {curr_date} to {curr_date} that would be informative for trading purposes? Make sure you only get the data posted during that period.",
+                        }
+                    ],
+                }
+            ],
+            text={"format": {"type": "text"}},
+            reasoning={},
+            tools=[
+                {
+                    "type": "web_search_preview",
+                    "user_location": {"type": "approximate"},
+                    "search_context_size": "low",
+                }
+            ],
+            temperature=1,
+            max_output_tokens=4096,
+            top_p=1,
+            store=True,
+        )
 
-    return response.output[1].content[0].text
+        return response.output[1].content[0].text
 
 
-def get_fundamentals_openai(ticker, curr_date):
+def get_fundamentals(ticker, curr_date):
     config = get_config()
-    client = OpenAI(base_url=config["backend_url"])
+    
+    # Check if using Google API - implement grounding with Google Search
+    if "generativelanguage.googleapis.com" in config["backend_url"]:
+        try:
+            from google import genai
+            from google.genai.types import Tool, GenerateContentConfig, GoogleSearch
+            
+            client = genai.Client()
+            
+            # Create Google Search grounding tool
+            google_search_tool = Tool(
+                google_search=GoogleSearch()
+            )
+            
+            # Generate content with grounding
+            response = client.models.generate_content(
+                model=config["quick_think_llm"],
+                contents=f"Search for fundamental analysis data and financial metrics for {ticker} stock from the month before {curr_date} to the month of {curr_date}. Look for earnings reports, financial ratios like PE, PS, cash flow, revenue growth, analyst ratings, and any fundamental analysis discussions. Please present key metrics in a structured format.",
+                config=GenerateContentConfig(
+                    tools=[google_search_tool],
+                    response_modalities=["TEXT"]
+                )
+            )
+            
+            # Extract text from response
+            result_text = ""
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, 'text'):
+                    result_text += part.text
+            
+            return result_text
+            
+        except Exception as e:
+            return f"Error retrieving fundamentals for {ticker}: {str(e)}"
+    else:
+        # For OpenAI and other APIs, use original implementation
+        client = OpenAI(base_url=config["backend_url"])
 
-    response = client.responses.create(
-        model=config["quick_think_llm"],
-        input=[
-            {
-                "role": "system",
-                "content": [
-                    {
-                        "type": "input_text",
-                        "text": f"Can you search Fundamental for discussions on {ticker} during of the month before {curr_date} to the month of {curr_date}. Make sure you only get the data posted during that period. List as a table, with PE/PS/Cash flow/ etc",
-                    }
-                ],
-            }
-        ],
-        text={"format": {"type": "text"}},
-        reasoning={},
-        tools=[
-            {
-                "type": "web_search_preview",
-                "user_location": {"type": "approximate"},
-                "search_context_size": "low",
-            }
-        ],
-        temperature=1,
-        max_output_tokens=4096,
-        top_p=1,
-        store=True,
-    )
+        response = client.responses.create(
+            model=config["quick_think_llm"],
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": f"Can you search Fundamental for discussions on {ticker} during of the month before {curr_date} to the month of {curr_date}. Make sure you only get the data posted during that period. List as a table, with PE/PS/Cash flow/ etc",
+                        }
+                    ],
+                }
+            ],
+            text={"format": {"type": "text"}},
+            reasoning={},
+            tools=[
+                {
+                    "type": "web_search_preview",
+                    "user_location": {"type": "approximate"},
+                    "search_context_size": "low",
+                }
+            ],
+            temperature=1,
+            max_output_tokens=4096,
+            top_p=1,
+            store=True,
+        )
 
-    return response.output[1].content[0].text
+        return response.output[1].content[0].text
