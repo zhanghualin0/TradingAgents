@@ -16,7 +16,7 @@ class GoogleSearchProvider(SearchProvider):
         self.client = genai.Client()
         self.model = model
     
-    def search(self, query: str, ticker: str, curr_date: str) -> str:
+    def search(self, query: str) -> str:
         google_search_tool = Tool(
             google_search=GoogleSearch()
         )
@@ -44,7 +44,7 @@ class OpenAISearchProvider(SearchProvider):
         self.client = OpenAI(base_url=backend_url)
         self.model = model
     
-    def search(self, query: str, ticker: str, curr_date: str) -> str:
+    def search(self, query: str) -> str:
         response = self.client.responses.create(
             model=self.model,
             input=[
